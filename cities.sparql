@@ -1,0 +1,27 @@
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX : <http://dbpedia.org/resource/>
+PREFIX dbpedia2: <http://dbpedia.org/property/>
+PREFIX dbpedia: <http://dbpedia.org/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+
+SELECT * WHERE {
+?place a <http://dbpedia.org/ontology/City> .
+?place <http://dbpedia.org/ontology/populationTotal> ?pop .
+?place <http://dbpedia.org/ontology/country> :United_Kingdom .
+?place foaf:depiction ?image .
+?place <http://dbpedia.org/ontology/abstract> ?abstract .
+FILTER (LANG(?abstract)='en')
+?place rdfs:label ?label .
+FILTER (LANG(?label)='en')
+?place <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat .
+?place <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?long .
+FILTER ( ?pop > 0 )
+}
+ORDER BY ?pop
+
