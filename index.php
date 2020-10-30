@@ -23,7 +23,7 @@ foreach( $city_data["results"]["bindings"] as $record ) {
 	foreach( $record as $key=>$value ) {
 		$city[$key] = $value["value"];
 	}
-	$cities []= $city;
+	$cities [$city["place"]]= $city;
 }
 
 foreach( $dates as &$date ) {
