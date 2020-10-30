@@ -75,7 +75,7 @@ foreach( $dates as $date ) {
 		print "<div class='card'>";
 
 		print "<div class='card-body'>";
-		print "<img src='".$city["image"]."' class='rounded float-right ml-3' style='width:30%' alt='' >";
+		print "<img src='".preg_replace( "/^http:/", "https:", $city["image"])."' class='rounded float-right ml-3' style='width:30%' alt='' >";
 		print "<h3 class='card-title'>";
 		print $city["label"];
 		print "</h3>";
