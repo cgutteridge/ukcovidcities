@@ -59,8 +59,9 @@ foreach( $dates as &$date ) {
 
 <div class="container">
     <h1>UK COVID Death in perspective <?php print $last["date"] ?></h1>
+    <p>This page shows the death total in the UK compared to the sizes of UK cities (according to Wikipedia)</p>
+</div>
 
-<p>This page shows the death total in the UK compared to the sizes of UK cities (according to Wikipedia)</p>
 <div class="container">
 <?php
 $city = null;
@@ -102,11 +103,24 @@ foreach( $dates as $date ) {
 
 	print "<div class='row'>";
 	print "<div class='col-sm'>".date("F jS", $date["time_t"])."</div>";
-	print "<div class='col-sm'>".$date["deaths"]."</div>";
+	print "<div class='col-sm'>".$date["deaths"]." dead in the UK from COVID-19</div>";
 	#print "<div class='col-sm'>".$date["city"]["label"]." (population ".$date["city"]["pop"].")</div>";
-	print "</div>";
+	print "</div>\n";
 }
+print "<p>(not showing places with less than 1000 population)</p>";
+print "</div>";
+if(false){
+print "<hr />";
+print '<div class="container">';
+print '<h2>All cities</h2>';
+print '<ul>';
+foreach( $cities as $city ) {
+	print "<li>".$city["label"]." - ".$city["pop"]."</li>\n";
+}
+print '</ul>';
+print "</div>";
+}
+
 ?>
-</div>
   </body>
 </html>
