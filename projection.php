@@ -55,9 +55,20 @@ $max = array(
 	"7day"=>0,
 	"7daychange"=>0,
 );
+$min = array (
+	"7daychange"=>1,
+);
+$MAXGROW = 5;
 foreach( $dates as &$date ) {
 	if( $date["7day"] > $max["7day"] ) {
 		$max["7day"] = $date["7day"];
+	}
+	if( $date["7daychange"] > $max["7daychange"] && $date["7daychange"] < $MAXGROW ) {
+		$max["7daychange"] = $date["7daychange"];
+		
+	}
+	if( $date["7daychange"] < $min["7daychange"] && $date["7daychange"]>0 ) {
+		$min["7daychange"] = $date["7daychange"];
 	}
 }
 
@@ -81,6 +92,7 @@ foreach( $dates as &$date ) {
 <style>
 .data {
 	text-align: right;
+	padding: 2px 1em;
 }
 .lockdown {
 	background-color: #ffffcc;
@@ -91,27 +103,65 @@ foreach( $dates as &$date ) {
 .weekend.lockdown {
 	background-color: #f0f0cc;
 }
+.good {
+	color: #3f3;
+}
+.bad {
+	color: #f33;
+}
+table {
+    	border-spacing: 0px;
+	border-collapse: collapse;
+}
+td {
+	padding:0px 1em;
+	white-space: nowrap;
+}
+th {
+	border-right: solid 1px white;
+	padding: 2px 1em;
+	white-space: nowrap;
+}
+.nobar, .goodbar, .midbar, .badbar, .bar {
+	display: inline-block;
+}
+.nobar { 
+}
+.bar {
+	background-color: #666;
+}
+.midbar { 
+	width: 1px;
+	background-color: #eee;
+}
+.badbar {
+	background-color: #c33;
+}
+.goodbar {
+	background-color: #3c3;
+}
+	
 </style>
 <div class="container" >
 <h1>COVID Stats and projection</h1>
-<p>This page uses data from the UK government API. Specifically it's using "newCasesByPublishDate" for the UK.</p>
+<p>This page uses data from the UK government API. Specifically it's using "newCasesByPublishDate" for the UK. Download: <a href="<?php print $url;?>">Raw JSON data</a>.</p>
 <p>Daily average for a date is the average of that date and the 6 days proceeding it.</p>
 <p>Daily change is the change between a date's (7 day averaged) cases and the value for 7 days before that, so seeing the increase or decrease in the number of average cases-per-day this week to average cases-per-day last week.</p>
-<p>The next bit shows the time it would take for the number of cases to double based on this change (or halve if it's negative).</p>
-<p>The last column shows a projection if cases kept increasing from that date, at that rate. </p>
+<p>The next bit shows the time it would take for the number of cases to <span class='bad'>double</span> based on this change (or <span class='good'>halve</span> if it's negative).</p>
+<p>The last column shows a projection if cases kept increasing from that date, at that rate for 4 weeks. This is the "what will happen if nothing changes", or just plain how worrying the situation is.</p>
 <p>Yellow tint shows days of national lockdowns or widespread Tier 4.</p>
-</div>
-<div class="container" >
-<div class="row" style='background-color: #000;color: #fff;'>
-<div class='col-sm'>Date</div>
-<!--<div class='col-sm data'>New Cases</div>-->
-<div class='col-sm data'>7 Day Average</div>
-<div class='col-sm data'></div>
-<div class='col-sm data'>Daily Change</div>
-<div class='col-sm data'></div>
-<div class='col-sm data'>Time for cases to double (or halve)</div>
-<div class='col-sm data'>28 day projection</div>
-</div>
+<p>My <a href='https://github.com/cgutteridge/ukcovidcities'>code is on github</a> if you want to check my working or play with a copy.</p>
+<table>
+<tr class="" style='background-color: #000;color: #fff;'>
+<th class='first'>Date</th>
+<!--<th class=' data'>New Cases</th>-->
+<th class=' '>7 Day<br />Average</th>
+<th class=' '></th>
+<th class=' '>Daily<br />Change</th>
+<th class=' '></th>
+<th class=' '>Time for cases to<br> <span class='bad'>double</span> (or <span class='good'>halve</span>)</th>
+<th class=' last' colspan='2'>28 day projection<br />for thousand cases/day</th>
+</tr>
 <?php
 foreach( $dates as $iso=>$date ) {
 	$class = "";
@@ -124,37 +174,45 @@ foreach( $dates as $iso=>$date ) {
 	if( date("l", $date["time_t"])=="Saturday" || date("l", $date["time_t"])=="Sunday" ) {
 		$class.=" weekend";
 	}
-	print "<div class='row $class' >";
-	print "<div class='col-sm'>";
+	print "<tr class='$class' >";
+	print "<td class='first'>";
 	print date("M jS", $date["time_t"]);
-	print "</div>";
-	//print sprintf( "<div class='col-sm data'>%d</div>\n", $date["stat"] );
-	print sprintf( "<div class='col-sm data'>%d</div>\n", $date["7day"] );
-	print sprintf( "<div class='col-sm'><div style='display:inline-block;width: %dpx;background-color:#666'>&nbsp;</div></div>", 100*$date["7day"]/$max["7day"] );
-	#print sprintf( "<div class='col-sm data'>x%0.4f</div>\n", $daychange );
+	print "</td>";
+	//print sprintf( "<td class=' data'>%d</td>\n", $date["stat"] );
+	print sprintf( "<td class=' data'>%d</td>\n", $date["7day"] );
+	print sprintf( "<td class=''><div class='bar' style='width: %dpx;'>&nbsp;</div></td>", 100*$date["7day"]/$max["7day"] );
+	#print sprintf( "<td class=' data'>x%0.4f</td>\n", $daychange );
 
-	print sprintf( "<div class='col-sm data'>%d%%</div>\n", ($daychange*100)-100 );
+	print sprintf( "<td class=' data'>%d%%</td>\n", ($daychange*100)-100 );
 
-	print sprintf( "<div class='col-sm'>" );
-	if( $date["7daychange"] < 0.4 ){
-		print sprintf( "<div style='display:inline-block;width: %dpx;background-color:#3c3'></div>", 50 );
-		print sprintf( "<div style='display:inline-block;width: 1px;background-color:#333'>&nbsp;</div>" );
-	} elseif( $date["7daychange"] < 1 ) {
-		print sprintf( "<div style='display:inline-block;width: %dpx;'>&nbsp;</div>", 50-floor(40*(1/$date["7daychange"]-1) ));
-		print sprintf( "<div style='display:inline-block;width: %dpx;background-color:#3c3'>&nbsp;</div>", floor(40*(1/$date["7daychange"]-1) ));
-		print sprintf( "<div style='display:inline-block;width: 1px;background-color:#333'>&nbsp;</div>" );
-	} elseif( $date["7daychange"] > 2.5 ) {
-		print sprintf( "<div style='display:inline-block;width: %dpx;'>&nbsp;</div>", 50 );
-		print sprintf( "<div style='display:inline-block;width: 1px;background-color:#333'>&nbsp;</div>" );
-		print sprintf( "<div style='text-align:right;color:white;display:inline-block;width: %dpx;background-color:#f33'>+</div>", 49 );
-	} else {
-		print sprintf( "<div style='display:inline-block;width: %dpx;'>&nbsp;</div>", 50 );
-		print sprintf( "<div style='display:inline-block;width: 1px;background-color:#333'>&nbsp;</div>" );
-		print sprintf( "<div style='display:inline-block;width: %dpx;background-color:#f33'>&nbsp;</div>", (40*($date["7daychange"]-1) ));
+	print sprintf( "<td class=''>" );
+	$gwidth = 200;
+	$range = 0;
+	$w1 = 0;
+	$range += ($max["7daychange"]-1);
+	if( $min["7daychange"]>0 ) {
+		$range += (1/$min["7daychange"]-1);
+		$w1 = (1/$min["7daychange"]-1)/$range*$gwidth;
 	}
-	print sprintf( "</div>" );
+	
+	if( $date["7daychange"] < 1 ) {
+		$v = floor((1/$date["7daychange"]-1)/$range*$gwidth);
+		print sprintf( "<div class='  nobar' style='width: %dpx;'>&nbsp;</div>", $w1-$v );
+		print sprintf( "<div class='goodbar' style='width: %dpx;'>&nbsp;</div>", $v );
+		print sprintf( "<div class=' midbar' style='width: 1px;'>&nbsp;</div>" );
+	} else {
+		$v = floor(($date["7daychange"]-1)/$range*$gwidth);
+		if( $date["7daychange"]-1>$MAXGROW ) {
+			print "very high";
+		} else {
+			print sprintf( "<div class='  nobar' style='width: %dpx;'>&nbsp;</div>", $w1 );
+			print sprintf( "<div class=' midbar' style='width: 1px;'>&nbsp;</div>" );
+			print sprintf( "<div class=' badbar' style='width: %dpx;'>&nbsp;</div>", $v );
+		}
+	}
+	print sprintf( "</td>" );
 
-	print sprintf( "<div class='col-sm'>" );
+	print sprintf( "<td class='data'>" );
 	if( $daychange < 1 ) {
 		# time to halve 
 		# c^x = 0.5
@@ -163,28 +221,39 @@ foreach( $dates as $iso=>$date ) {
 		# x= log(0.5)/log(c)
 		$days = log(0.5)/log($daychange);
 		if( $days>=100 ) {
-			print sprintf( "<div class='col-sm data'><div style='color: #333 !important'>stable</div></div>\n" );
+			print sprintf( "<div style='color: #333 !important'>stable</div>\n" );
 		} else {
-			print sprintf( "<div class='col-sm data'><div style='color: #3c3 !important'>%d days</div></div>\n", $days );
+			print sprintf( "<div style='color: #3c3 !important'>%d days</div>\n", $days );
 		}
 	}
 	if( $daychange > 1 ) {
 		$days = log(2)/log($daychange);
 		if( $days<2 ) {
-			print sprintf( "<div class='col-sm data'><div style='color: #f33 !important'>%d hours</div></div>\n", $days*24 );
+			print sprintf( "<div style='color: #f33 !important'>%d hours</div>\n", $days*24 );
 		} elseif( $days>=100 ) {
-			print sprintf( "<div class='col-sm data'><div style='color: #333 !important'>stable</div></div>\n" );
+			print sprintf( "<div style='color: #333 !important'>stable</div>\n" );
 		} else {
-			print sprintf( "<div class='col-sm data'><div style='color: #f33 !important'>%d days</div></div>\n", $days );
+			print sprintf( "<div style='color: #f33 !important'>%d days</div>\n", $days );
 		}
 	}
-	print sprintf( "</div>" );
+	print sprintf( "</td>" );
 		
-	
-	print sprintf( "<div class='col-sm data'>%d</div>\n", $date["stat"]*pow($daychange,7*4) );
-	print "</div>\n";
+	$proj = floor(($date["stat"]*pow($daychange,28))/1000);
+	print sprintf( "<td class=' data'>" );
+	print sprintf( "%d K", $proj );
+	print "</td>\n";
+	print "<td>\n";
+	$v = $proj/2;
+	if( $v>200 ) {
+		print "very high";
+	} else {
+		print sprintf( "<div class='bar' style='width: %dpx;'>&nbsp;</div>", $v );
+	}
+	print "</td>\n";
+	print "</tr>\n";
 }
 ?>
+</table>
     </div>
   </body>
 </html>
