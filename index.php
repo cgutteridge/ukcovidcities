@@ -5,7 +5,7 @@ $opts = array(
 	'structure'=>'{"date":"date","areaName":"areaName","cumDeaths28DaysByDeathDate":"cumDeaths28DaysByDeathDate"}',
 	'format'=>'json' );
 $deathsURL = "https://api.coronavirus.data.gov.uk/v1/data?".http_build_query($opts) ;
-$json = file_get_contents( $deathsURL );
+#$json = file_get_contents( $deathsURL );
 $data = json_decode( gzdecode( file_get_contents( $deathsURL )), true );
 $dates = array();
 foreach( $data["data"] as $record ) {
