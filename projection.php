@@ -83,7 +83,13 @@ foreach( $dates as &$date ) {
 	text-align: right;
 }
 .lockdown {
-	background: url(lighthazard.png);
+	background-color: #ffffcc;
+}
+.weekend {
+	background-color: #f0f0f0;
+}
+.weekend.lockdown {
+	background-color: #f0f0cc;
 }
 </style>
 <div class="container" >
@@ -93,6 +99,7 @@ foreach( $dates as &$date ) {
 <p>Daily change is the change between a date's (7 day averaged) cases and the value for 7 days before that, so seeing the increase or decrease in the number of average cases-per-day this week to average cases-per-day last week.</p>
 <p>The next bit shows the time it would take for the number of cases to double based on this change (or halve if it's negative).</p>
 <p>The last column shows a projection if cases kept increasing from that date, at that rate. </p>
+<p>Yellow tint shows days of national lockdowns or widespread Tier 4.</p>
 </div>
 <div class="container" >
 <div class="row" style='background-color: #000;color: #fff;'>
@@ -107,14 +114,20 @@ foreach( $dates as &$date ) {
 </div>
 <?php
 foreach( $dates as $iso=>$date ) {
+	$class = "";
 	//if ( $date["date"] < "2020-07-01" ) { continue; }
 	if( !array_key_exists( "7daychange", $date ) ) { continue; }
 	$daychange = pow($date["7daychange"],1/7);
-	#if( $iso >= "2020-03-23"  && $iso <= "2020-05-13" ) { $class = "lockdown lockdown1"; }
-	#if( $iso >= "2020-11-05"  && $iso <= "2020-11-02" ) { $class = "lockdown lockdown2"; }
-	#if( $iso >= "2020-12-26"  && $iso <= "2030-11-02" ) { $class = "lockdown tier4"; }
+	if( $iso >= "2020-03-23"  && $iso <= "2020-05-13" ) { $class = "lockdown lockdown1"; }
+	if( $iso >= "2020-11-05"  && $iso <= "2020-12-02" ) { $class = "lockdown lockdown2"; }
+	if( $iso >= "2020-12-26"  && $iso <= "2030-11-02" ) { $class = "lockdown tier4"; }
+	if( date("l", $date["time_t"])=="Saturday" || date("l", $date["time_t"])=="Sunday" ) {
+		$class.=" weekend";
+	}
 	print "<div class='row $class' >";
-	print "<div class='col-sm'>".date("M jS", $date["time_t"])."</div>";
+	print "<div class='col-sm'>";
+	print date("M jS", $date["time_t"]);
+	print "</div>";
 	//print sprintf( "<div class='col-sm data'>%d</div>\n", $date["stat"] );
 	print sprintf( "<div class='col-sm data'>%d</div>\n", $date["7day"] );
 	print sprintf( "<div class='col-sm'><div style='display:inline-block;width: %dpx;background-color:#666'>&nbsp;</div></div>", 100*$date["7day"]/$max["7day"] );
@@ -127,15 +140,15 @@ foreach( $dates as $iso=>$date ) {
 		print sprintf( "<div style='display:inline-block;width: %dpx;background-color:#3c3'></div>", 50 );
 		print sprintf( "<div style='display:inline-block;width: 1px;background-color:#333'>&nbsp;</div>" );
 	} elseif( $date["7daychange"] < 1 ) {
-		print sprintf( "<div style='display:inline-block;width: %dpx;background-color:white'>&nbsp;</div>", 50-floor(40*(1/$date["7daychange"]-1) ));
+		print sprintf( "<div style='display:inline-block;width: %dpx;'>&nbsp;</div>", 50-floor(40*(1/$date["7daychange"]-1) ));
 		print sprintf( "<div style='display:inline-block;width: %dpx;background-color:#3c3'>&nbsp;</div>", floor(40*(1/$date["7daychange"]-1) ));
 		print sprintf( "<div style='display:inline-block;width: 1px;background-color:#333'>&nbsp;</div>" );
 	} elseif( $date["7daychange"] > 2.5 ) {
-		print sprintf( "<div style='display:inline-block;width: %dpx;background-color:#fff'>&nbsp;</div>", 50 );
+		print sprintf( "<div style='display:inline-block;width: %dpx;'>&nbsp;</div>", 50 );
 		print sprintf( "<div style='display:inline-block;width: 1px;background-color:#333'>&nbsp;</div>" );
 		print sprintf( "<div style='text-align:right;color:white;display:inline-block;width: %dpx;background-color:#f33'>+</div>", 49 );
 	} else {
-		print sprintf( "<div style='display:inline-block;width: %dpx;background-color:#fff'>&nbsp;</div>", 50 );
+		print sprintf( "<div style='display:inline-block;width: %dpx;'>&nbsp;</div>", 50 );
 		print sprintf( "<div style='display:inline-block;width: 1px;background-color:#333'>&nbsp;</div>" );
 		print sprintf( "<div style='display:inline-block;width: %dpx;background-color:#f33'>&nbsp;</div>", (40*($date["7daychange"]-1) ));
 	}
