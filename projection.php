@@ -181,7 +181,7 @@ foreach( $dates as $iso=>$date ) {
 	print sprintf( "</div>" );
 		
 	
-	print sprintf( "<div class='col-sm data'>%d</div>\n", $date["stat"]*pow($daychange,13*4) );
+	print sprintf( "<div class='col-sm data'>%d</div>\n", $date["stat"]*pow($daychange,7*4) );
 	print "</div>\n";
 }
 ?>
