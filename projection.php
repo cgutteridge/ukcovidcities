@@ -238,12 +238,13 @@ foreach( $dates as $iso=>$date ) {
 	}
 	print sprintf( "</td>" );
 		
-	$proj = floor(($date["stat"]*pow($daychange,28))/1000);
-	print sprintf( "<td class=' data'>" );
-	print sprintf( "%d K", $proj );
+	$proj = $date["stat"]*pow($daychange,28);
+	$desc = sprintf( '%d cases * %0.2f^28 = %d cases * %0.2f = %d', $date["stat"], $daychange, $date["stat"], pow($daychange,28), $proj );
+	print sprintf( "<td class=' data' title='$desc' style='cursor:pointer'>" );
+	print sprintf( "%d K", floor($proj/1000) );
 	print "</td>\n";
 	print "<td>\n";
-	$v = $proj/2;
+	$v = $proj/2000;
 	if( $v>200 ) {
 		print "very high";
 	} else {
