@@ -239,7 +239,7 @@ foreach( $dates as $iso=>$date ) {
 	}
 	print sprintf( "</td>" );
 		
-	$proj = floor(($date["stat"]*pow($daychange,7*4))/1000);
+	$proj = floor(($date["stat"]*pow($daychange,28))/1000);
 	print sprintf( "<td class=' data'>" );
 	print sprintf( "%d K", $proj );
 	print "</td>\n";
