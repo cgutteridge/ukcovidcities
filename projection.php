@@ -175,11 +175,12 @@ foreach( $dates as $iso=>$date ) {
 		$class.=" weekend";
 	}
 	print "<tr class='$class' >";
+	
 	print "<td class='first'>";
 	print date("M jS", $date["time_t"]);
 	print "</td>";
 	//print sprintf( "<td class=' data'>%d</td>\n", $date["stat"] );
-	print sprintf( "<td class=' data'>%d</td>\n", $date["7day"] );
+	print sprintf( "<td class=' data' style='cursor:pointer' title='%d cases on this date'>%d</td>\n", $date['stat'],$date["7day"] );
 	print sprintf( "<td class=''><div class='bar' style='width: %dpx;'>&nbsp;</div></td>", 100*$date["7day"]/$max["7day"] );
 	#print sprintf( "<td class=' data'>x%0.4f</td>\n", $daychange );
 
