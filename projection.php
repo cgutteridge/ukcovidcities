@@ -58,14 +58,13 @@ $max = array(
 $min = array (
 	"7daychange"=>1,
 );
-$MAXGROW = 5;
+$MAXGROW = 1.5; # max % change in 7 days not to be considered too high to graph
 foreach( $dates as &$date ) {
 	if( $date["7day"] > $max["7day"] ) {
 		$max["7day"] = $date["7day"];
 	}
 	if( $date["7daychange"] > $max["7daychange"] && $date["7daychange"] < $MAXGROW ) {
 		$max["7daychange"] = $date["7daychange"];
-		
 	}
 	if( $date["7daychange"] < $min["7daychange"] && $date["7daychange"]>0 ) {
 		$min["7daychange"] = $date["7daychange"];
@@ -140,12 +139,17 @@ th {
 .goodbar {
 	background-color: #3c3;
 }
-	
+.event {
+	border-top: solid 2px black;
+	border-bottom: solid 2px black;
+	text-align: center;
+}	
 </style>
 <div class="container" >
 <h1>COVID Stats and projection</h1>
 <p>This page uses data from the UK government API. Specifically it's using "newCasesByPublishDate" for the UK. Download: <a href="<?php print $url;?>">Raw JSON data</a>.</p>
 <p>Daily average for a date is the average of that date and the 6 days proceeding it.</p>
+<p>Doublings is how many times it has doubled since 1 case. So 1=0 doublings. 2 to 3=1 doubling, 4 to 7 = 2 doublings, 8 to 15 = 3 doublings. When cases are shrinking you can combine this with "time to halve" to see how long it would take with current conditions to reach 1 case (then hopefully zero).</p>
 <p>Daily change is the change between a date's (7 day averaged) cases and the value for 7 days before that, so seeing the increase or decrease in the number of average cases-per-day this week to average cases-per-day last week.</p>
 <p>The next bit shows the time it would take for the number of cases to <span class='bad'>double</span> based on this change (or <span class='good'>halve</span> if it's negative).</p>
 <p>The last column shows a projection if cases kept increasing from that date, at that rate for 4 weeks. This is the "what will happen if nothing changes", or just plain how worrying the situation is.</p>
@@ -159,6 +163,7 @@ th {
 <th class=' '></th>
 <th class=' '>Daily<br />Change</th>
 <th class=' '></th>
+<th class=' '>Doublings</th>
 <th class=' '>Time for cases to<br> <span class='bad'>double</span> (or <span class='good'>halve</span>)</th>
 <th class=' last' colspan='2'>28 day projection<br />for thousand cases/day</th>
 </tr>
@@ -167,10 +172,26 @@ foreach( $dates as $iso=>$date ) {
 	$class = "";
 	//if ( $date["date"] < "2020-07-01" ) { continue; }
 	if( !array_key_exists( "7daychange", $date ) ) { continue; }
+
+	$event = "";
+	if( $iso == "2020-03-23" ) { $event = "Lockdown #1 begins"; }
+	if( $iso == "2021-04-12" ) { $event = "Lockdown #3 begins"; }
+	if( $iso == "2020-05-14" ) { $event = "Lockdown #1 ends"; }
+	if( $iso == "2020-05-24" ) { $event = "Prime Minister defends Cummings' Bernard Castle trip"; }
+	if( $iso == "2020-09-02" ) { $event = "Schools reopen"; }
+	if( $iso == "2020-09-21" ) { $event = "Universities reopen (exact date varies by institution)"; }
+	if( $iso == "2020-11-05" ) { $event = "Lockdown #2 begins"; }
+	if( $iso == "2020-12-03" ) { $event = "Lockdown #2 ends"; }
+	if( $iso == "2020-12-25" ) { $event = "Rules relaxed for Christmas day"; }
+	if( $iso == "2020-12-26" ) { $event = "Stricter rules for much of UK"; }
+	if( $iso == "2021-01-05" ) { $event = "Lockdown #3 begins"; }
+
+
 	$daychange = pow($date["7daychange"],1/7);
+
 	if( $iso >= "2020-03-23"  && $iso <= "2020-05-13" ) { $class = "lockdown lockdown1"; }
 	if( $iso >= "2020-11-05"  && $iso <= "2020-12-02" ) { $class = "lockdown lockdown2"; }
-	if( $iso >= "2020-12-26"  && $iso <= "2030-11-02" ) { $class = "lockdown tier4"; }
+	if( $iso >= "2021-01-05"  && $iso <= "2030-11-02" ) { $class = "lockdown tier4"; }
 	if( date("l", $date["time_t"])=="Saturday" || date("l", $date["time_t"])=="Sunday" ) {
 		$class.=" weekend";
 	}
@@ -213,6 +234,7 @@ foreach( $dates as $iso=>$date ) {
 	}
 	print sprintf( "</td>" );
 
+	print sprintf( "<td class=' data'>%s</td>\n", floor($date["7day"])>0 ? floor( log($date["7day"])/log(2) ) : "N/A" );
 	print sprintf( "<td class='data'>" );
 	if( $daychange < 1 ) {
 		# time to halve 
@@ -253,6 +275,12 @@ foreach( $dates as $iso=>$date ) {
 	}
 	print "</td>\n";
 	print "</tr>\n";
+
+
+	if( $event != "" ) {
+		print "<tr><td colspan='9' class='event'>".htmlspecialchars($event)."</td></tr>";
+	}
+
 }
 ?>
 </table>
