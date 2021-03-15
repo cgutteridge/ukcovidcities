@@ -185,6 +185,7 @@ foreach( $dates as $iso=>$date ) {
 	if( $iso == "2020-12-25" ) { $event = "Rules relaxed for Christmas day"; }
 	if( $iso == "2020-12-26" ) { $event = "Stricter rules for much of UK"; }
 	if( $iso == "2021-01-05" ) { $event = "Lockdown #3 begins"; }
+	if( $iso == "2021-03-08" ) { $event = "Schools reopen"; }
 
 
 	$daychange = pow($date["7daychange"],1/7);
