@@ -1,8 +1,15 @@
 <?php
 
+$showInfo = false;
+$areaType = "nation";
+if( @$_GET['areaType'] ) { $areaType = $_GET['areaType']; $showInfo = true; }
+$areaName = "";
+if( @$_GET['areaName'] ) { $areaName = $_GET['areaName']; $showInfo = true; }
 $measure = "newCasesByPublishDate";
+if( @$_GET['measure'] ) { $measure = $_GET['measure']; $showInfo = true; }
 $opts = array( 
-	'filters'=>'areaType=nation',
+	#'filters'=>'areaType=nation',
+	'filters'=>'areaType='.$areaType.'&areaName='.$areaName,
 	'structure'=>'{"date":"date","areaName":"areaName","'.$measure.'":"'.$measure.'"}',
 	'format'=>'json' );
 $url = "https://api.coronavirus.data.gov.uk/v1/data?".http_build_query($opts) ;
@@ -155,6 +162,15 @@ th {
 <p>The last column shows a projection if cases kept increasing from that date, at that rate for 4 weeks. This is the "what will happen if nothing changes", or just plain how worrying the situation is.</p>
 <p>Yellow tint shows days of national lockdowns or widespread Tier 4.</p>
 <p>My <a href='https://github.com/cgutteridge/ukcovidcities'>code is on github</a> if you want to check my working or play with a copy.</p>
+<?php
+if( $showInfo ) {
+	print "<h1>Using custom settings:</h1>";
+	print "<p>Area Type: <strong>".htmlspecialchars($areaType)."</strong></p>";
+	print "<p>Area Name: <strong>".htmlspecialchars($areaName)."</strong></p>";
+	print "<p>Measure: <strong>".htmlspecialchars($measure)."</strong></p>";
+}
+
+?>
 <table>
 <tr class="" style='background-color: #000;color: #fff;'>
 <th class='first'>Date</th>
