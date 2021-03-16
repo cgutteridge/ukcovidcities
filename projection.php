@@ -5,12 +5,12 @@ $areaType = "nation";
 if( @$_GET['areaType'] ) { $areaType = $_GET['areaType']; $showInfo = true; }
 $areaName = "";
 if( @$_GET['areaName'] ) { $areaName = $_GET['areaName']; $showInfo = true; }
-$measure = "newCasesByPublishDate";
-if( @$_GET['measure'] ) { $measure = $_GET['measure']; $showInfo = true; }
+$metric = "newCasesByPublishDate";
+if( @$_GET['metric'] ) { $metric = $_GET['metric']; $showInfo = true; }
 $opts = array( 
 	#'filters'=>'areaType=nation',
 	'filters'=>'areaType='.$areaType.'&areaName='.$areaName,
-	'structure'=>'{"date":"date","areaName":"areaName","'.$measure.'":"'.$measure.'"}',
+	'structure'=>'{"date":"date","areaName":"areaName","'.$metric.'":"'.$metric.'"}',
 	'format'=>'json' );
 $url = "https://api.coronavirus.data.gov.uk/v1/data?".http_build_query($opts) ;
 
@@ -20,8 +20,8 @@ $data = json_decode( gzdecode( file_get_contents( $url )), true );
 $dates = array();
 foreach( $data["data"] as $record ) {
 	$dates[$record["date"]]["date"]=$record["date"];
-	@$dates[$record["date"]]["stat"]+=$record[$measure];
-	$dates[$record["date"]]["nation"][$record["areaName"]]=$record[$measure];
+	@$dates[$record["date"]]["stat"]+=$record[$metric];
+	$dates[$record["date"]]["nation"][$record["areaName"]]=$record[$metric];
 }
 krsort( $dates );
 
@@ -167,7 +167,7 @@ if( $showInfo ) {
 	print "<h1>Using custom settings:</h1>";
 	print "<p>Area Type: <strong>".htmlspecialchars($areaType)."</strong></p>";
 	print "<p>Area Name: <strong>".htmlspecialchars($areaName)."</strong></p>";
-	print "<p>Measure: <strong>".htmlspecialchars($measure)."</strong></p>";
+	print "<p>Metric: <strong>".htmlspecialchars($metric)."</strong></p>";
 }
 
 ?>
