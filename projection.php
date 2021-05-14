@@ -191,7 +191,6 @@ foreach( $dates as $iso=>$date ) {
 
 	$event = "";
 	if( $iso == "2020-03-23" ) { $event = "Lockdown #1 begins"; }
-	if( $iso == "2021-04-12" ) { $event = "Lockdown #3 begins"; }
 	if( $iso == "2020-05-14" ) { $event = "Lockdown #1 ends"; }
 	if( $iso == "2020-05-24" ) { $event = "Prime Minister defends Cummings' Bernard Castle trip"; }
 	if( $iso == "2020-09-02" ) { $event = "Schools reopen"; }
@@ -202,13 +201,16 @@ foreach( $dates as $iso=>$date ) {
 	if( $iso == "2020-12-26" ) { $event = "Stricter rules for much of UK"; }
 	if( $iso == "2021-01-05" ) { $event = "Lockdown #3 begins"; }
 	if( $iso == "2021-03-08" ) { $event = "Schools reopen"; }
+	if( $iso == "2021-03-29" ) { $event = "Lockdown #3 ends, pubs still shut in England"; }
+	if( $iso == "2021-04-12" ) { $event = "Pubs (garden only) and other non-essentials reopen in England"; }
+	if( $iso == "2021-05-17" ) { $event = "England relaxes further to indoor rule-of-six"; }
 
 
 	$daychange = pow($date["7daychange"],1/7);
 
 	if( $iso >= "2020-03-23"  && $iso <= "2020-05-13" ) { $class = "lockdown lockdown1"; }
 	if( $iso >= "2020-11-05"  && $iso <= "2020-12-02" ) { $class = "lockdown lockdown2"; }
-	if( $iso >= "2021-01-05"  && $iso <= "2030-11-02" ) { $class = "lockdown tier4"; }
+	if( $iso >= "2021-01-05"  && $iso <= "2021-03-28" ) { $class = "lockdown tier4"; }
 	if( date("l", $date["time_t"])=="Saturday" || date("l", $date["time_t"])=="Sunday" ) {
 		$class.=" weekend";
 	}
@@ -222,7 +224,7 @@ foreach( $dates as $iso=>$date ) {
 	print sprintf( "<td class=''><div class='bar' style='width: %dpx;'>&nbsp;</div></td>", 100*$date["7day"]/$max["7day"] );
 	#print sprintf( "<td class=' data'>x%0.4f</td>\n", $daychange );
 
-	print sprintf( "<td class=' data'>%d%%</td>\n", ($daychange*100)-100 );
+	print sprintf( "<td class=' data'>%.1f%%</td>\n", ($daychange*100)-100 );
 
 	print sprintf( "<td class=''>" );
 	$gwidth = 200;
