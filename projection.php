@@ -7,9 +7,11 @@ $areaName = "";
 if( @$_GET['areaName'] ) { $areaName = $_GET['areaName']; $showInfo = true; }
 $metric = "newCasesByPublishDate";
 if( @$_GET['metric'] ) { $metric = $_GET['metric']; $showInfo = true; }
+$filters = 'areaType='.$areaType;
+if( @$areaName ) { $filters .= ';areaName='.$areaName; }
 $opts = array( 
 	#'filters'=>'areaType=nation',
-	'filters'=>'areaType='.$areaType.';areaName='.$areaName,
+	'filters'=>$filters,
 	'structure'=>'{"date":"date","areaName":"areaName","'.$metric.'":"'.$metric.'"}',
 	'format'=>'json' );
 $url = "https://api.coronavirus.data.gov.uk/v1/data?".http_build_query($opts) ;
